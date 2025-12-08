@@ -1,232 +1,138 @@
 # 🍺 Drink Label Classifier
 
-An AI-powered web application that uses OCR (Optical Character Recognition) and deep learning to automatically identify and classify drink labels from images.
+AI-powered drink classification system using OCR and deep learning to identify 30 different drink brands from images.
 
-![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15.0-orange.svg)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.31.0-red.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+## 🎯 Features
 
-## 🌟 Features
+- **Image Upload**: Drag & drop or click to upload drink label images
+- **OCR Processing**: Automatically extracts text from images using Tesseract
+- **Text Classification**: Predicts drink brand using trained neural network
+- **Top 5 Predictions**: Shows confidence scores for top 5 matches
+- **REST API**: Full API for integration with other applications
+- **Web Interface**: Beautiful, responsive UI for easy testing
 
-- **OCR Text Extraction**: Automatically extracts text from drink label images using Tesseract OCR
-- **AI Classification**: Uses deep learning (LSTM/CNN/GRU) to classify drinks into 30 categories
-- **Real-time Predictions**: Instant classification with confidence scores
-- **Top-5 Predictions**: Shows the most likely drink matches
-- **User-friendly Interface**: Clean and intuitive Streamlit web interface
-- **Export Results**: Download prediction results as JSON
+## 🏷️ Supported Drinks (30 Classes)
 
-## 🍹 Supported Drinks (30 Classes)
+Chrome, Fanta, 4th Street Wine, Captain Morgan, Johnnie Walker, Tusker, Guarana, Smirnoff Ice, Predator, Coca Cola, Spirit, Kibao, Guinness, Afia, Novida, White Cap, Senator Keg, Gilbeys Gin, Heineken, Pilsner, Hunters, Allsops, Balozi, Kingfisher, Jameson, Richot, Bond7, Del Monte Juice, Minute Maid, Pepsi
 
-The system can identify the following drinks:
+## 🚀 Quick Start
 
-- **Beers**: Tusker, Guinness, White Cap, Senator Keg, Heineken, Pilsner, Hunters, Allsops, Balozi, Kingfisher
-- **Spirits**: Captain Morgan, Johnnie Walker, Smirnoff Ice, Gilbeys Gin, Jameson
-- **Wines**: 4th Street Wine
-- **Sodas**: Coca Cola, Fanta, Pepsi, Predator, Guarana, Novida
-- **Energy Drinks**: Chrome, Spirit, Kibao, Afia
-- **Juices**: Del Monte Juice, Minute Maid
-- **Others**: Richot, Bond7
+### Local Setup
 
-## 🚀 Live Demo
-
-[Deploy on Streamlit Cloud](https://streamlit.io/)
-
-## 📋 Prerequisites
-
-Before running this project, you need:
-
-1. **Python 3.9 or higher**
-2. **Tesseract OCR** installed on your system:
-   - **Windows**: Download from [GitHub Tesseract](https://github.com/UB-Mannheim/tesseract/wiki)
-   - **Mac**: `brew install tesseract`
-   - **Linux**: `sudo apt-get install tesseract-ocr`
-
-3. **Trained Model Files** (required):
-   - `best_ocr_drink_classifier.h5` or `ocr_drink_classifier_final.h5`
-   - `tokenizer.pkl`
-   - `model_config.json`
-
-## 🛠️ Installation
-
-### 1. Clone the Repository
-
+1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/drink-label-classifier.git
-cd drink-label-classifier
+git clone https://github.com/YOUR_USERNAME/drink-classifier.git
+cd drink-classifier
 ```
 
-### 2. Create Virtual Environment (Recommended)
-
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
-
-# Mac/Linux
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Install Dependencies
-
+2. **Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Add Model Files
+3. **Install Tesseract OCR**
+- **Ubuntu/Linux**: `sudo apt-get install tesseract-ocr`
+- **Mac**: `brew install tesseract`
+- **Windows**: Download from [GitHub](https://github.com/UB-Mannheim/tesseract/wiki)
 
-Place your trained model files in the project root directory:
-- `best_ocr_drink_classifier.h5`
-- `tokenizer.pkl`
-- `model_config.json`
-
-**Note**: These files are generated from the training script. If you don't have them, you need to train the model first using the provided training code.
-
-## 💻 Usage
-
-### Running Locally
-
+4. **Run the application**
 ```bash
-streamlit run app.py
+python app.py
 ```
 
-The app will open in your default browser at `http://localhost:8501`
+5. **Open browser**
+Navigate to `http://localhost:5000`
 
-### Using the App
+## 📡 API Endpoints
 
-1. **Upload Image**: Click "Browse files" and select a drink label image
-2. **Classify**: Click the "🔮 Classify Drink" button
-3. **View Results**: See the predicted drink name and confidence score
-4. **Export**: Download results as JSON if needed
+### 1. Health Check
+```bash
+GET /health
+```
 
-## 📁 Project Structure
+### 2. Get All Labels
+```bash
+GET /labels
+```
+
+### 3. Predict from Image
+```bash
+POST /predict
+Content-Type: multipart/form-data
+Parameters: file (jpg, jpeg, png)
+```
+
+### 4. Predict from Text
+```bash
+POST /predict-text
+Content-Type: application/json
+Body: {"text": "coca cola"}
+```
+
+## 🛠️ Technology Stack
+
+- **Backend**: Flask (Python)
+- **ML Framework**: TensorFlow/Keras
+- **OCR**: Tesseract + OpenCV
+- **Model**: LSTM/CNN/GRU for text classification
+- **Frontend**: HTML, CSS, JavaScript
+- **Deployment**: Render
+
+## 📊 Model Architecture
+
+The classifier uses a neural network trained on OCR-extracted text:
+- **Input**: Text sequences from drink labels
+- **Embedding Layer**: 128-dimensional word embeddings
+- **Recurrent Layers**: Bidirectional LSTM/GRU
+- **Output**: 30-class softmax classifier
+
+## 📝 Project Structure
 
 ```
-drink-label-classifier/
-│
-├── app.py                          # Main Streamlit application
+drink-classifier/
+├── app.py                          # Flask application
 ├── requirements.txt                # Python dependencies
-├── README.md                       # This file
-├── .gitignore                      # Git ignore rules
-├── .streamlit/
-│   └── config.toml                # Streamlit configuration
-│
-├── best_ocr_drink_classifier.h5   # Trained model (not in repo)
-├── tokenizer.pkl                   # Tokenizer (not in repo)
-├── model_config.json              # Model config (not in repo)
-│
-└── training/
-    └── train_model.py             # Training script (optional)
+├── render.yaml                     # Render deployment config
+├── best_ocr_drink_classifier.h5    # Trained model
+├── tokenizer.pkl                   # Text tokenizer
+├── model_config.json               # Model configuration
+├── templates/
+│   └── index.html                  # Web interface
+└── uploads/                        # Temporary uploads
 ```
 
-## 🎯 Training Your Own Model
+## 🌐 Deployment on Render
 
-To train the model from scratch:
+1. Push code to GitHub
+2. Go to [render.com](https://render.com)
+3. Create new Blueprint
+4. Connect your repository
+5. Render will automatically deploy using `render.yaml`
 
-1. Organize your dataset:
-```
-dataset/
-├── Chrome/
-│   ├── image1.jpg
-│   ├── image2.jpg
-│   └── ...
-├── Fanta/
-│   ├── image1.jpg
-│   └── ...
-└── ...
-```
-
-2. Run the training script:
-```python
-python train_model.py
-```
-
-3. The trained model files will be generated:
-   - `best_ocr_drink_classifier.h5`
-   - `tokenizer.pkl`
-   - `model_config.json`
-
-## 🚀 Deployment
-
-### Deploy to Streamlit Cloud
-
-1. Push your code to GitHub
-2. Go to [share.streamlit.io](https://share.streamlit.io)
-3. Connect your GitHub repository
-4. Deploy!
-
-**Important**: You'll need to:
-- Add `packages.txt` with `tesseract-ocr` for Linux deployment
-- Ensure model files are in the repository or use cloud storage
-
-### Deploy to Heroku
+## 🧪 Testing
 
 ```bash
-heroku create your-app-name
-git push heroku main
+# Health check
+curl https://your-app.onrender.com/health
+
+# Text prediction
+curl -X POST https://your-app.onrender.com/predict-text \
+  -H "Content-Type: application/json" \
+  -d '{"text": "coca cola"}'
+
+# Image upload
+curl -X POST https://your-app.onrender.com/predict \
+  -F "file=@image.jpg"
 ```
 
-Add a `Procfile`:
-```
-web: sh setup.sh && streamlit run app.py
-```
+## 📄 License
 
-## ⚙️ Configuration
+MIT License
 
-Edit `.streamlit/config.toml` to customize:
+## 👥 Contributors
 
-- Theme colors
-- Server settings
-- Upload limits
-- Browser settings
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🐛 Known Issues
-
-- OCR accuracy depends on image quality and lighting
-- Low-resolution images may not work well
-- Text needs to be clearly visible in the image
-
-## 🔮 Future Enhancements
-
-- [ ] Add batch processing for multiple images
-- [ ] Improve OCR preprocessing for better accuracy
-- [ ] Add image augmentation for training
-- [ ] Support for more drink categories
-- [ ] Mobile app version
-- [ ] API endpoint for integration
-
-## 👥 Authors
-
-- **Your Name** - [GitHub Profile](https://github.com/yourusername)
-
-## 🙏 Acknowledgments
-
-- TensorFlow team for the deep learning framework
-- Streamlit for the amazing web framework
-- Tesseract OCR for text extraction capabilities
-- All contributors and users of this project
-
-## 📧 Contact
-
-For questions or support, please open an issue or contact:
-- Email: your.email@example.com
-- GitHub: [@yourusername](https://github.com/yourusername)
+Your Name/Team
 
 ---
 
-**Made with ❤️ and Python**
+**Made with ❤️ for drink classification**

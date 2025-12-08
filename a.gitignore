@@ -16,77 +16,42 @@ parts/
 sdist/
 var/
 wheels/
-pip-wheel-metadata/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # Virtual Environment
 venv/
 env/
 ENV/
-env.bak/
-venv.bak/
+.venv
 
-# IDEs
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# OS
 .DS_Store
+Thumbs.db
 
-# Jupyter Notebook
-.ipynb_checkpoints
-*.ipynb
-
-# Model Files (Large files - use Git LFS or cloud storage)
-*.h5
-*.pkl
-*.json
-best_ocr_drink_classifier.h5
-ocr_drink_classifier_final.h5
-tokenizer.pkl
-model_config.json
-
-# Training outputs
-training_history.png
-confusion_matrix.png
-ocr_confusion_matrix.png
-ocr_training_history.png
-
-# Dataset (too large for git)
-dataset/
-data/
-images/
-drinks_dataset/
+# Uploads
+uploads/*
+!uploads/.gitkeep
 
 # Logs
 *.log
-logs/
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
 
 # Environment variables
 .env
 .env.local
 
-# OS
-Thumbs.db
-desktop.ini
-
-# Streamlit
-.streamlit/secrets.toml
+# Test files
+test_*.py
+tests/
 
 # Temporary files
-temp/
 tmp/
-*.tmp
-*.bak
-*.swp
+temp/
