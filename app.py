@@ -11,6 +11,11 @@ import re
 import io
 import os
 
+# Check if TensorFlow loaded successfully
+if tf is None:
+    st.error("TensorFlow failed to load in this environment.")
+    st.stop()
+
 # Page configuration
 st.set_page_config(
     page_title="Drink Label Classifier",
