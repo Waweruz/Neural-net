@@ -70,25 +70,52 @@ DRINK_LABELS = [
 def load_model_and_tokenizer():
     """Load the trained model and tokenizer"""
     try:
-        # Try loading from different possible locations
+        # Check if model files exist locally
         model_paths = ['best_ocr_drink_classifier.h5', 'ocr_drink_classifier_final.h5']
         model = None
         
+        # Try loading from local files first
         for path in model_paths:
             if os.path.exists(path):
                 model = keras.models.load_model(path)
                 st.success(f"✅ Model loaded from {path}")
                 break
         
+        # If no local model, try downloading from cloud (optional)
         if model is None:
-            st.error("❌ Model file not found. Please upload the trained model.")
+            st.warning("⚠️ Model files not found locally.")
+            
+            # Option to download from Google Drive or other cloud storage
+            # Uncomment and add your model URLs if using cloud storage:
+            
+            # MODEL_URL = "YOUR_GOOGLE_DRIVE_DIRECT_LINK"
+            # TOKENIZER_URL = "YOUR_TOKENIZER_DIRECT_LINK"
+            # CONFIG_URL = "YOUR_CONFIG_DIRECT_LINK"
+            
+            # import requests
+            # with st.spinner("Downloading model from cloud..."):
+            #     # Download model
+            #     r = requests.get(MODEL_URL)
+            #     with open('model.h5', 'wb') as f:
+            #         f.write(r.content)
+            #     model = keras.models.load_model('model.h5')
+            
+            st.error("❌ Model file not found. Please add model files to the repository or configure cloud storage.")
             return None, None, None
         
         # Load tokenizer
+        if not os.path.exists('tokenizer.pkl'):
+            st.error("❌ tokenizer.pkl not found")
+            return None, None, None
+            
         with open('tokenizer.pkl', 'rb') as f:
             tokenizer = pickle.load(f)
         
         # Load config
+        if not os.path.exists('model_config.json'):
+            st.error("❌ model_config.json not found")
+            return None, None, None
+            
         with open('model_config.json', 'r') as f:
             config = json.load(f)
         
@@ -96,6 +123,7 @@ def load_model_and_tokenizer():
     
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
+        st.error("Please check the logs for more details.")
         return None, None, None
 
 def preprocess_image_for_ocr(image):
