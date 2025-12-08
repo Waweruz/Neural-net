@@ -1,18 +1,92 @@
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
 build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
 venv/
 env/
-*.egg-info/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Model Files (Large files - use Git LFS or cloud storage)
 *.h5
 *.pkl
-*.pickle
+*.json
+best_ocr_drink_classifier.h5
+ocr_drink_classifier_final.h5
+tokenizer.pkl
+model_config.json
+
+# Training outputs
+training_history.png
+confusion_matrix.png
+ocr_confusion_matrix.png
+ocr_training_history.png
+
+# Dataset (too large for git)
 dataset/
+data/
+images/
+drinks_dataset/
+
+# Logs
 *.log
-.streamlit/
-.DS_Store
+logs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Environment variables
+.env
+.env.local
+
+# OS
 Thumbs.db
+desktop.ini
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Temporary files
+temp/
+tmp/
 *.tmp
+*.bak
+*.swp
