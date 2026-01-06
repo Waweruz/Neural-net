@@ -1,4 +1,10 @@
 import streamlit as st
+import os
+
+# Set TensorFlow environment variables BEFORE importing TensorFlow
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
@@ -8,7 +14,6 @@ from PIL import Image
 import cv2
 import pytesseract
 import re
-import os
 
 # Page configuration
 st.set_page_config(
@@ -29,8 +34,15 @@ Upload an image of a drink, and the model will identify it!
 def load_model_and_config():
     """Load the trained model, tokenizer, and configuration"""
     try:
-        # Load model
-        model = keras.models.load_model('best_ocr_drink_classifier.h5')
+        # Load model with compile=False to avoid optimizer issues
+        model = keras.models.load_model('best_ocr_drink_classifier.h5', compile=False)
+        
+        # Recompile with current TensorFlow version
+        model.compile(
+            optimizer=keras.optimizers.Adam(learning_rate=0.001),
+            loss='categorical_crossentropy',
+            metrics=['accuracy']
+        )
         
         # Load tokenizer
         with open('tokenizer.pkl', 'rb') as f:
@@ -41,33 +53,44 @@ def load_model_and_config():
             config = json.load(f)
         
         return model, tokenizer, config
+    except FileNotFoundError as e:
+        st.error(f"Model file not found: {e}")
+        st.info("Please ensure model files are in the same directory as this app.")
+        return None, None, None
     except Exception as e:
         st.error(f"Error loading model: {e}")
-        st.info("Please ensure model files are in the same directory as this app.")
+        st.info(f"Error details: {str(e)}")
         return None, None, None
 
 # OCR preprocessing
 def preprocess_image_for_ocr(image):
     """Preprocess image to improve OCR accuracy"""
-    # Convert PIL Image to OpenCV format
-    img = np.array(image)
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    
-    # Convert to grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
-    # Apply thresholding
-    gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    
-    # Denoise
-    gray = cv2.medianBlur(gray, 3)
-    
-    return gray
+    try:
+        # Convert PIL Image to OpenCV format
+        img = np.array(image)
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        
+        # Convert to grayscale
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
+        # Apply thresholding
+        gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+        
+        # Denoise
+        gray = cv2.medianBlur(gray, 3)
+        
+        return gray
+    except Exception as e:
+        st.error(f"Error preprocessing image: {e}")
+        return None
 
 def extract_text_from_image(image):
     """Extract text from drink label using OCR"""
     try:
         processed_img = preprocess_image_for_ocr(image)
+        
+        if processed_img is None:
+            return ""
         
         # Extract text using Tesseract OCR
         text = pytesseract.image_to_string(processed_img, config='--psm 6')
@@ -83,34 +106,38 @@ def extract_text_from_image(image):
 
 def predict_drink(image, model, tokenizer, config):
     """Predict drink label from image"""
-    # Extract text using OCR
-    extracted_text = extract_text_from_image(image)
-    
-    if not extracted_text or len(extracted_text) < 3:
-        return None, None, extracted_text
-    
-    # Tokenize and pad
-    sequence = tokenizer.texts_to_sequences([extracted_text])
-    padded = tf.keras.preprocessing.sequence.pad_sequences(
-        sequence, 
-        maxlen=config['max_length'], 
-        padding='post', 
-        truncating='post'
-    )
-    
-    # Predict
-    predictions = model.predict(padded, verbose=0)
-    predicted_idx = np.argmax(predictions[0])
-    confidence = predictions[0][predicted_idx]
-    
-    # Get top 5 predictions
-    top_5_idx = np.argsort(predictions[0])[-5:][::-1]
-    top_5_labels = [config['labels'][idx] for idx in top_5_idx]
-    top_5_probs = [predictions[0][idx] for idx in top_5_idx]
-    
-    predicted_label = config['labels'][predicted_idx]
-    
-    return predicted_label, confidence, extracted_text, top_5_labels, top_5_probs
+    try:
+        # Extract text using OCR
+        extracted_text = extract_text_from_image(image)
+        
+        if not extracted_text or len(extracted_text) < 3:
+            return None, None, extracted_text, None, None
+        
+        # Tokenize and pad
+        sequence = tokenizer.texts_to_sequences([extracted_text])
+        padded = keras.preprocessing.sequence.pad_sequences(
+            sequence, 
+            maxlen=config['max_length'], 
+            padding='post', 
+            truncating='post'
+        )
+        
+        # Predict
+        predictions = model.predict(padded, verbose=0)
+        predicted_idx = np.argmax(predictions[0])
+        confidence = predictions[0][predicted_idx]
+        
+        # Get top 5 predictions
+        top_5_idx = np.argsort(predictions[0])[-5:][::-1]
+        top_5_labels = [config['labels'][idx] for idx in top_5_idx]
+        top_5_probs = [predictions[0][idx] for idx in top_5_idx]
+        
+        predicted_label = config['labels'][predicted_idx]
+        
+        return predicted_label, confidence, extracted_text, top_5_labels, top_5_probs
+    except Exception as e:
+        st.error(f"Error during prediction: {e}")
+        return None, None, "", None, None
 
 # Main app
 def main():
